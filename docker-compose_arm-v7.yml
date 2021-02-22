@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  db:
+    image: jc21/mariadb-aria:latest
+    restart: always
+    ports:
+      - 127.0.0.1:3306:3306
+    volumes:
+      - db:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD='${DB_PASSWORD}'
+      - MYSQL_PASSWORD='${DB_PASSWORD}'
+      - MYSQL_DATABASE='${DB_USER}'
+      - MYSQL_USER='${DB_USER}'
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+
+  app:
+    image: nextcloud
+    restart: always
+    ports:
+      - 127.0.0.1:8080:80
+    volumes:
+      - nextcloud:/var/www/html
+    environment:
+      - MYSQL_PASSWORD='${DB_PASSWORD}'
+      - MYSQL_DATABASE='${DB_USER}'
+      - MYSQL_USER='${DB_USER}'
+      - MYSQL_HOST=db
+    links:
+      - db
+
+volumes:
+  db:
+  nextcloud:
