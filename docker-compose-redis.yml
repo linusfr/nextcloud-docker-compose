@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: linusfr/postgres:13-arm-v7
+    restart: unless-stopped
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: '${DB_USER}'
+      POSTGRES_DB: '${DB_USER}'
+      POSTGRES_PASSWORD: '${DB_PASSWORD}'
+    ports:
+      - 127.0.0.1:5432:5432
+
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+    command: redis-server --requirepass '${DB_PASSWORD}'
+
+  nextcloud:
+    image: nextcloud
+    restart: unless-stopped
+    links:
+      - postgres
+      - redis
+    volumes:
+      - nextcloud:/var/www/html
+    environment:
+      POSTGRES_USER: '${DB_USER}'
+      POSTGRES_DB: '${DB_USER}'
+      POSTGRES_PASSWORD: '${DB_PASSWORD}'
+      POSTGRES_HOST: postgres
+
+      REDIS_HOST: redis
+      REDIS_HOST_PASSWORD: '${DB_PASSWORD}'
+
+      NEXTCLOUD_TRUSTED_DOMAINS: '${DOMAIN}'
+      NEXTCLOUD_OVERWRITE_CLI_URL: https://'${DOMAIN}'
+      NEXTCLOUD_OVERWRITEPROTOCOL: https
+      
+      NEXTCLOUD_ADMIN_USER: '${DB_USER}'
+      NEXTCLOUD_ADMIN_PASSWORD: '${DB_PASSWORD}'
+    ports: 
+      - 127.0.0.1:8080:80
+
+volumes:
+  postgres:
+  nextcloud:
