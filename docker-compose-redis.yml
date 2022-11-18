@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   postgres:
-    image: linusfr/postgres:13-arm-v7
+    image: postgres:13-alpine
     restart: unless-stopped
     volumes:
       - postgres:/var/lib/postgresql/data
@@ -38,10 +38,10 @@ services:
       NEXTCLOUD_TRUSTED_DOMAINS: '${DOMAIN}'
       NEXTCLOUD_OVERWRITE_CLI_URL: https://'${DOMAIN}'
       NEXTCLOUD_OVERWRITEPROTOCOL: https
-      
+
       NEXTCLOUD_ADMIN_USER: '${DB_USER}'
       NEXTCLOUD_ADMIN_PASSWORD: '${DB_PASSWORD}'
-    ports: 
+    ports:
       - 127.0.0.1:8080:80
 
 volumes:
